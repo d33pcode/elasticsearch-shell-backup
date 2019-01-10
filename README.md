@@ -1,16 +1,10 @@
 Elasticsearch Backup Shell Script
-==============================================
+=================================
 
 About
 -------------
 
-This scripts
-
-Original script are provided by @karelbemelmans
-
-- [Elasticsearch backup script with snapshot rotation · Karel Bemelmans](https://www.karelbemelmans.com/2015/03/elasticsearch-backup-script-with-snapshot-rotation/)
-
-Our customized script replace URL to shell variable and split file with function.
+### THIS IS STILL A WIP. USAGE IS NOT ENCOURAGED.
 
 Configuration
 ------------------------
@@ -117,3 +111,8 @@ Tool commands
 curl -X GET http://localhost:9200/_snapshot/es_backup/_all 2>/dev/null | jq -r '.snapshots [] .snapshot'
 ```
 
+Credits
+-------
+
+- @karelbemelmans for the [original scripts](https://www.karelbemelmans.com/2015/03/elasticsearch-backup-script-with-snapshot-rotation/)
+- @UnicastInc for the [custom repo I've forked](https://github.com/UnicastInc/elasticsearch-shell-backup)
