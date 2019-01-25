@@ -4,7 +4,7 @@ Elasticsearch Backup Shell Script
 About
 -------------
 
-### THIS IS STILL A WIP. USAGE IS NOT ENCOURAGED.
+### THIS IS STILL A WIP. USAGE IS DISCOURAGED.
 
 Configuration
 ------------------------
