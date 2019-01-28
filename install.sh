@@ -15,6 +15,7 @@ function die_usage() {
 }
 
 function build_vars() {
+	auth_needed=true
 	while getopts ":hH:nr:u:p:" opt; do
 		case $opt in
 			h)  die_usage 0             ;;
@@ -47,6 +48,9 @@ function build_vars() {
 	fi
 
 	key=`printf ${username}:${password} | base64`
+	if [ -f secret.key ]; then
+		mv secret.key secret.key.orig
+	fi
 	echo ${key} >> secret.key
 }
 
@@ -86,21 +90,6 @@ function interactive_config() {
 	fi
 }
 
-
-# if [ $# -eq 0 ]; then
-#     echo "No arguments supplied. Running in interactive mode."
-#     interactive_config
-#     echo "ElasticSearch IP: ${elastic_host}"
-#     echo "repo name: ${repo_name}"
-#     echo "auth: ${auth_needed}"
-#     if ${auth_needed}; then
-#         echo "auth"
-#     else
-#         echo "no auth"
-#     fi
-# else
-#     build_vars  $@
-# fi
 
 function write_config() {
 	if [ $# -eq 0 ]; then
@@ -150,20 +139,28 @@ function write_config() {
 }
 
 function create_repo() {
-	echo "ok"
+	echo -e "\nConfiguring Snapshot Repository...\n"
+	query=$(cat <<-EOF
+		curl --request PUT
+		--url http://${elastic_host}:9200/_snapshot/${repo_name}
+		--header 'content-type: application/json'
+	EOF
+	)
+	if ${auth_needed}; then
+		query="${query} --header 'authorization: Basic $(cat secret.key)' "
+	fi
+	query=${query}$(cat <<-EOF
+		--data '{
+			"type":"fs",
+			"settings": {
+				"location": "/var/backups/elastic"
+			}
+		}'
+	EOF
+	)
+	eval ${query}
+	echo -e "\n\nRepository initialized.\n"
 }
 
 write_config $@
-
-
-
-# curl --request PUT \
-#   --url http://52.30.246.201:9200/_snapshot/bebop_backup \
-#   --header 'authorization: Basic ZWxhc3RpYzozZjZPVDMyVlZldUQ=' \
-#   --header 'content-type: application/json' \
-#   --data '{
-# 	"type":"fs",
-# 	"settings": {
-# 		"location": "/var/backups/elastic"
-# 	}
-# }'
+create_repo
